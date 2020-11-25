@@ -1,5 +1,5 @@
-var svgWidth = 960;
-var svgHeight = 500;
+var svgWidth = 1000;
+var svgHeight = 800;
 
 var margin = {
   top: 20,
@@ -30,7 +30,7 @@ var chosenXAxis = "Poverty (%)";
 function xScale(censusData, chosenXAxis) {
   // create scales
   var xLinearScale = d3.scaleLinear()
-    .domain([d3.min(censusData, d => d[chosenXAxis]) * 0.8,
+    .domain([d3.min(censusData, d => d[chosenXAxis])* 0.8,
       d3.max(censusData, d => d[chosenXAxis]) * 1.2
     ])
     .range([0, chartWidth]);
@@ -65,27 +65,27 @@ function renderCircles(circlesGroup, newXScale, chosenXaxis) {
 function updateToolTip(chosenXAxis, circlesGroup) {
 
   if (chosenXAxis === "Poverty (%)") {
-    var label = "Poverty (%):";
+    var label = abbr;
   }
   else {
-    var label = "Age (Median):";
+    var label = abbr;
   }
 
   var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80, -60])
     .html(function(d) {
-      return (`${d.abbr}<br>${label} ${d[chosenXAxis]}`);
+      return (`${d.abbr}`);
     });
 
   circlesGroup.call(toolTip);
 
   circlesGroup.on("mouseover", function(data) {
-    toolTip.show(data);
+    toolTip.show(data, this);
   })
     // onmouseout event
-    .on("mouseout", function(data, index) {
-      toolTip.hide(data);
+    .on("mouseout", function(data) {
+      toolTip.hide(data, this);
     });
 
   return circlesGroup;
