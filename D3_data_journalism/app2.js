@@ -1,5 +1,5 @@
-var svgWidth = 960;
-var svgHeight = 500;
+var svgWidth = 1000;
+var svgHeight = 800;
 
 var margin = {
   top: 20,
@@ -31,7 +31,7 @@ function xScale(censusData, chosenXAxis) {
   // create scales
   var xLinearScale = d3.scaleLinear()
     .domain([d3.min(censusData, d => d[chosenXAxis])* 0.8,
-    d3.max(censusData, d => d[chosenXAxis]) * 1.2
+      d3.max(censusData, d => d[chosenXAxis]) * 1.2
     ])
     .range([0, chartWidth]);
 
@@ -44,7 +44,7 @@ function renderAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
 
   xAxis.transition()
-    .duration(1000)
+    .duration(100)
     .call(bottomAxis);
 
   return xAxis;
@@ -62,7 +62,7 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 }
 
 // function used for updating circles group with new tooltip
-function updateTooltip(chosenXAxis, circlesGroup) {
+function updateToolTip(chosenXAxis, circlesGroup) {
 
   if (chosenXAxis === "In Poverty (%)") {
     var label = poverty;
@@ -71,52 +71,52 @@ function updateTooltip(chosenXAxis, circlesGroup) {
     var label = age;
   }
 
-  var tooltip = d3.tip()
-    .attr("class", "tooltip")
+  var toolTip = d3.tip()
+    .attr("class", "toolTip")
     .offset([80, -60])
-    .html(function (d) {
+    .html(function(d) {
       return (`${d.abbr}<br>${label} ${d[chosenXAxis]}`);
     });
 
-  circlesGroup.call(tooltip);
+  circlesGroup.call(toolTip);
 
-  circlesGroup.on("mouseover", function (data) {
-    tooltip.show(data, this);
+  circlesGroup.on("mouseover", function(data) {
+    toolTip.show(data, this);
   })
     // onmouseout event
-    .on("mouseout", function (data) {
-      tooltip.hide(data, this);
+    .on("mouseout", function(data) {
+      toolTip.hide(data, this);
     });
 
   return circlesGroup;
-};
+}
 
 // Load data from data.csv
-d3.csv("d3_data_journalism/data.csv").then(function (censusData) {
+d3.csv("d3_data_journalism/data.csv").then(function(censusData) {
 
-  console.log(censusData);
-
-  // log a list of names
-  var ids = censusData.map(data => data.id);
-  console.log("ids", ids);
-
-  // Cast each hours value in censuData as a number using the unary + operator
-  censusData.forEach(function (data) {
-    poverty = +data.poverty;
-    age = +data.age;
-    obese = +data.obesity;
-    smoker = +data.smokes;
-    noHealthcare = +data.healthcare;
-    abbr = data.abbr;
-    income = +data.income;
-    console.log(poverty, age, obese, smoker, noHealthcare, abbr, income);
-  });
-  // xLinearScale function above csv import
+    console.log(censusData);
+  
+    // log a list of names
+    var ids = censusData.map(data => data.id);
+    console.log("ids", ids);
+  
+    // Cast each hours value in censuData as a number using the unary + operator
+    censusData.forEach(function(data) {
+      poverty = +data.poverty;
+      age = +data.age;
+      obese = +data.obesity;
+      smoker = +data.smokes;
+      noHealthcare = +data.healthcare;
+      abbr = data.abbr;
+      income = +data.income;
+      console.log(poverty, age, obese, smoker, noHealthcare, abbr, income);
+    });
+    // xLinearScale function above csv import
   var xLinearScale = xScale(censusData, chosenXAxis);
 
   // Create y scale function
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(censusData, d => d.obesity)])
+    .domain([0, d3.max(censusData, d => d.obese)])
     .range([chartHeight, 0]);
 
   // Create initial axis functions
@@ -139,7 +139,7 @@ d3.csv("d3_data_journalism/data.csv").then(function (censusData) {
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    .attr("cy", d => yLinearScale(d.obesity))
+    .attr("cy", d => yLinearScale(d.obese))
     .attr("r", 20)
     .attr("fill", "blue")
     .attr("opacity", ".5");
@@ -162,21 +162,16 @@ d3.csv("d3_data_journalism/data.csv").then(function (censusData) {
     .classed("inactive", true)
     .text("Age (Median)");
 
-  // append y axis
-  chartGroup.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0-margin.right)
-    .attr("x", 0 - (chartHeight / 2))
-    .attr("dy", "obese")
-    .classed("axis-text", true)
-    .text("Obese (%)");
+    // append y axis
+  chartGroup.append("g")
+    .call(leftAxis);
 
-  // updateTooltip function above csv import
-  var circlesGroup = updateTooltip(chosenXAxis, circlesGroup);
+  // updateToolTip function above csv import
+  var circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
   // x axis labels event listener
   labelsGroup.selectAll("text")
-    .on("click", function () {
+    .on("click", function() {
       // get value of selection
       var value = d3.select(this).attr("value");
       if (value !== chosenXAxis) {
@@ -197,27 +192,27 @@ d3.csv("d3_data_journalism/data.csv").then(function (censusData) {
         circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
 
         // updates tooltips with new info
-        circlesGroup = updateTooltip(chosenXAxis, circlesGroup);
+        circlesGroup = updateToolTip(chosenXAxis, circlesGroup);
 
-      // changes classes to change bold text
-      if (chosenXAxis === "In Poverty (%)") {
-        povertyLabel
-          .classed("active", true)
-          .classed("inactive", false);
-        ageLabel
-          .classed("active", false)
-          .classed("inactive", true);
-      }
-      else {
-        povertyLabel
-          .classed("active", false)
-          .classed("inactive", true);
-        ageLabel
-          .classed("active", true)
-          .classed("inactive", false);
+        // changes classes to change bold text
+        if (chosenXAxis === "age") {
+          povertyLabel
+            .classed("active", true)
+            .classed("inactive", false);
+          ageLabel
+            .classed("active", false)
+            .classed("inactive", true);
+        }
+        else {
+          ageLabel
+            .classed("active", false)
+            .classed("inactive", true);
+            povertyLabel
+            .classed("active", true)
+            .classed("inactive", false);
         }
       }
     });
-}).catch(function (error) {
-  console.log(error);
-});
+  }).catch(function(error) {
+    console.log(error);
+  });
