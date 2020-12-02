@@ -5,7 +5,7 @@
 }
 
 .active {
-  font-weight: bold;
+  font-weight: lighter;
   fill: #000;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
@@ -33,7 +33,6 @@
 .circle {
   fill: #89bdd3;
   stroke: #e3e3e3;
-  text: abbr;
 }
 
 .chart {

@@ -70,7 +70,7 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 function updateTooltip(chosenXAxis, circlesGroup) {
 
   if (chosenXAxis === "poverty") {
-    var label = 'age';
+    var label = 'poverty';
   }
   else {
     var label = 'poverty';
@@ -122,7 +122,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
 
   // Create y scale function
   var yLinearScale = d3.scaleLinear()
-    .domain([0, d3.max(censusData, d => d.obesity)])
+    .domain([0, d3.max(censusData, d => d.obesity)*1.1])
     .range([chartHeight, 0]);
 
   // Create initial axis functions
@@ -147,7 +147,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
-    .attr("cy", d => yLinearScale(d.obesity))
+    .attr("cy", d => yLinearScale(d.healthcare))
     .attr("r", 15)
     .attr("class", "circle");
 
@@ -157,7 +157,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
     .append("text")
     .text(d=> d.abbr)
     .attr("dx", d => xLinearScale(d[chosenXAxis]))
-    .attr("dy", d => yLinearScale(d.obesity))
+    .attr("dy", d => yLinearScale(d.healthcare))
     .attr('font-size', 10)
     .attr("class", "stateText")
 
@@ -174,12 +174,12 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
     .classed("active", true)
     .text("In Poverty (%)");
 
-  var ageLabel = labelsGroup.append("text")
-    .attr("x", 0)
-    .attr("y", 40)
-    .attr("value", "age") // value to grab for event listener
-    .classed("inactive", true)
-    .text("Age (Median)");
+  // var ageLabel = labelsGroup.append("text")
+  //   .attr("x", 0)
+  //   .attr("y", 40)
+  //   .attr("value", "poverty") // value to grab for event listener
+  //   .classed("inactive", true)
+  //   .text("Age (Median)");
 
   // append y axis
   chartGroup.append("text")
@@ -188,7 +188,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
     .attr("x", 0 - (chartHeight / 2))
     .attr("dy", "1em")
     .classed("axis-text", true)
-    .text("Obese (%)");
+    .text("Lacks Healthcare (%)");
 
   // updateTooltip function above csv import
   var circlesGroup = updateTooltip(chosenXAxis, circlesGroup);
@@ -221,20 +221,13 @@ d3.csv("d3_data_journalism/data.csv").then(censusData => {
         // changes classes to change bold text
         if (chosenXAxis === "poverty") {
           povertyLabel
-            .classed("active", true)
-            .classed("inactive", false);
-          ageLabel
-            .classed("active", false)
-            .classed("inactive", true);
+            .classed("active", true);
+          
         }
         else {
           povertyLabel
-            .classed("active", false)
-            .classed("inactive", true);
-          ageLabel
-            .classed("active", true)
-            .classed("inactive", false);
-        }
+           .classed("active", true);
+          }
       }
     });
 }).catch(function (error) {
