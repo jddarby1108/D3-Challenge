@@ -19,9 +19,12 @@ var svg = d3
   .attr("width", svgWidth)
   .attr("height", svgHeight);
 
+
+
 // Append an SVG group
 var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
 
 // Initial Params
 var chosenXAxis = "poverty";
@@ -32,10 +35,10 @@ function xScale(censusData, chosenXAxis) {
   console.log(censusData);
   // create scales
   var xLinearScale = d3.scaleLinear()
-  .domain([d3.min(censusData, d => d[chosenXAxis]) * 0.8,
-   d3.max(censusData, d => d[chosenXAxis]) *1.2
-   ])
-  .range([0, chartWidth]);
+    .domain([d3.min(censusData, d => d[chosenXAxis]) * .92,
+    d3.max(censusData, d => d[chosenXAxis]) * 1.02
+    ])
+    .range([0, chartWidth]);
 
   return xLinearScale;
 
@@ -67,10 +70,10 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis) {
 function updateTooltip(chosenXAxis, circlesGroup) {
 
   if (chosenXAxis === "poverty") {
-    var label = 'poverty';
+    var label = 'age';
   }
   else {
-    var label = 'age';
+    var label = 'poverty';
   }
 
   var tooltip = d3.tip()
@@ -94,7 +97,7 @@ function updateTooltip(chosenXAxis, circlesGroup) {
 };
 
 // Load data from data.csv
-d3.csv("d3_data_journalism/data.csv").then(censusData=> {
+d3.csv("d3_data_journalism/data.csv").then(censusData => {
 
   //console.log(censusData);
 
@@ -111,7 +114,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData=> {
     data.noHealthcare = +data.healthcare;
     data.abbr = data.abbr;
     data.income = +data.income;
-   // console.log(poverty, age, obese, smoker, noHealthcare, abbr, income);
+    // console.log(poverty, age, obese, smoker, noHealthcare, abbr, income);
   });
   // xLinearScale function above csv import
   // console.log(censusData);
@@ -138,14 +141,27 @@ d3.csv("d3_data_journalism/data.csv").then(censusData=> {
 
   // append initial circles
   var circlesGroup = chartGroup.selectAll("circle")
+
+  circlesGroup
     .data(censusData)
     .enter()
     .append("circle")
     .attr("cx", d => xLinearScale(d[chosenXAxis]))
     .attr("cy", d => yLinearScale(d.obesity))
-    .attr("r", 20)
-    .attr("fill", "blue")
-    .attr("opacity", ".5");
+    .attr("r", 15)
+    .attr("class", "circle");
+
+  circlesGroup
+    .data(censusData)
+    .enter()
+    .append("text")
+    .text(d=> d.abbr)
+    .attr("dx", d => xLinearScale(d[chosenXAxis]))
+    .attr("dy", d => yLinearScale(d.obesity))
+    .attr('font-size', 10)
+    .attr("class", "stateText")
+
+
 
   // Create group for  2 x- axis labels
   var labelsGroup = chartGroup.append("g")
@@ -168,7 +184,7 @@ d3.csv("d3_data_journalism/data.csv").then(censusData=> {
   // append y axis
   chartGroup.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", 0-margin.right)
+    .attr("y", 0 - margin.right)
     .attr("x", 0 - (chartHeight / 2))
     .attr("dy", "1em")
     .classed("axis-text", true)
@@ -202,22 +218,22 @@ d3.csv("d3_data_journalism/data.csv").then(censusData=> {
         // updates tooltips with new info
         circlesGroup = updateTooltip(chosenXAxis, circlesGroup);
 
-      // changes classes to change bold text
-      if (chosenXAxis === "poverty") {
-        povertyLabel
-          .classed("active", true)
-          .classed("inactive", false);
-        ageLabel
-          .classed("active", false)
-          .classed("inactive", true);
-      }
-      else {
-        povertyLabel
-          .classed("active", false)
-          .classed("inactive", true);
-        ageLabel
-          .classed("active", true)
-          .classed("inactive", false);
+        // changes classes to change bold text
+        if (chosenXAxis === "poverty") {
+          povertyLabel
+            .classed("active", true)
+            .classed("inactive", false);
+          ageLabel
+            .classed("active", false)
+            .classed("inactive", true);
+        }
+        else {
+          povertyLabel
+            .classed("active", false)
+            .classed("inactive", true);
+          ageLabel
+            .classed("active", true)
+            .classed("inactive", false);
         }
       }
     });

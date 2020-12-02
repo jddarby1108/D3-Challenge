@@ -1,4 +1,4 @@
-.aText {
+.axis-text {
   font-family: sans-serif;
   font-size: 16px;
   text-anchor: middle;
@@ -30,9 +30,10 @@
   text-anchor: middle;
 }
 
-.stateCircle {
+.circle {
   fill: #89bdd3;
   stroke: #e3e3e3;
+  text: abbr;
 }
 
 .chart {
